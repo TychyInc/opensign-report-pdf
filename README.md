@@ -19,7 +19,7 @@ OpenSignの利用料金請求書をPDF形式で生成するGoライブラリで�
 ## インストール
 
 ```bash
-go get github.com/ryuyama/opensign-report-pdf
+go get github.com/TychyInc/opensign-report-pdf
 ```
 
 ## ライブラリとしての使用方法
@@ -33,7 +33,7 @@ import (
     "os"
     "time"
     
-    opensignreport "github.com/ryuyama/opensign-report-pdf"
+    opensignreport "github.com/TychyInc/opensign-report-pdf"
 )
 
 func main() {
