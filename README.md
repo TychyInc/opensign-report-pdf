@@ -19,7 +19,7 @@ OpenSignの利用料金請求書をPDF形式で生成するGoライブラリで�
 ## インストール
 
 ```bash
-go get github.com/TychyInc/opensign-report-pdf
+go install  github.com/TychyInc/opensign-report-pdf@latest
 ```
 
 ## ライブラリとしての使用方法
