@@ -70,7 +70,7 @@ func (h ReceiptHeader) Execute(report gr.GoReport) {
 	report.Cell(col0Left, 68, "ご請求金額")
 	totalStr := "￥" + gr.AddComma(strconv.Itoa(h.data.TotalAmount)) + " -"
 	report.CellRight(col0Left+80, 68, 0, totalStr)
-	report.LineH(col0Left, 72, col0Left+80)
+	report.LineH(col0Left, 73, col0Left+80)
 
 	// Description
 	report.Font("NotoSansJP", FONT_SIZE_SMALL, "")
