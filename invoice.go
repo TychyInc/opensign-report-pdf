@@ -19,6 +19,8 @@ type Config struct {
 	BasicFee      int
 	FreeUsageCount int
 	UsageFeeRate  int
+	ServiceYear   int
+	ServiceMonth  int
 }
 
 // GenerateInvoice generates an invoice PDF with the given configuration and returns it as io.Reader
@@ -54,6 +56,8 @@ func GenerateInvoice(config Config) (io.Reader, error) {
 		TotalAmount:   total,
 		FreeUsageCount: freeUsageCount,
 		UsageFeeRate:  usageFeeRate,
+		ServiceYear:   config.ServiceYear,
+		ServiceMonth:  config.ServiceMonth,
 	}
 
 	reader, err := generatePDF(data)

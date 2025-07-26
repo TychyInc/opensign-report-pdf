@@ -16,6 +16,8 @@ func main() {
 		ReceiptNumber: "INV-2024-001",
 		IssueDate:     time.Now(),
 		MonthlyCount:  50, // 基本料金のみ
+		ServiceYear:   2024,
+		ServiceMonth:  1,
 	}
 
 	reader, err := opensignreport.GenerateInvoice(config)
@@ -43,6 +45,8 @@ func main() {
 		ReceiptNumber: "INV-2024-002",
 		IssueDate:     time.Date(2024, 1, 15, 0, 0, 0, 0, time.Local),
 		MonthlyCount:  250, // 基本料金 + 従量課金
+		ServiceYear:   2023,
+		ServiceMonth:  12,
 	}
 
 	reader2, err := opensignreport.GenerateInvoice(config2)
@@ -73,6 +77,8 @@ func main() {
 		BasicFee:      3000,      // 基本料金: 3000円
 		FreeUsageCount: 50,       // 無料利用枠: 50件
 		UsageFeeRate:  200,       // 従量課金単価: 200円/件
+		ServiceYear:   2024,
+		ServiceMonth:  1,
 	}
 
 	reader3, err := opensignreport.GenerateInvoice(config3)

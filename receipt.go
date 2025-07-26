@@ -15,6 +15,8 @@ type ReceiptData struct {
 	TotalAmount   int
 	FreeUsageCount int
 	UsageFeeRate  int
+	ServiceYear   int
+	ServiceMonth  int
 }
 
 func calculateFees(monthlyCount, basicFeeParam, freeUsageCount, usageFeeRate int) (basicFee, usageFee, tax, total int) {

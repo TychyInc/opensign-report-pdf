@@ -42,6 +42,8 @@ func main() {
         ReceiptNumber: "INV-2024-001",
         IssueDate:     time.Now(),
         MonthlyCount:  150,
+        ServiceYear:   2025,  // 利用年
+        ServiceMonth:  7,     // 利用月
         // Optional: Customize fees (defaults: BasicFee=2000, FreeUsageCount=100, UsageFeeRate=100)
         BasicFee:      2000,
         FreeUsageCount: 100,
@@ -102,6 +104,8 @@ go build -o opensign-invoice ./cmd/opensign-invoice
 - `ReceiptNumber` (必須): 請求書番号
 - `IssueDate`: 発行日（省略時は当日）
 - `MonthlyCount` (必須): 月間利用件数
+- `ServiceYear` (必須): 利用年（例: 2025）
+- `ServiceMonth` (必須): 利用月（例: 7）
 - `BasicFee`: 基本料金（デフォルト: 2,000円）
 - `FreeUsageCount`: 無料利用件数（デフォルト: 100件）
 - `UsageFeeRate`: 従量課金単価（デフォルト: 100円/件）
@@ -127,7 +131,7 @@ go build -o opensign-invoice ./cmd/opensign-invoice
 - 請求書番号
 - 発行日
 - 請求金額（税込）
-- 但し書き: "OpenSign利用料として"
+- 但し書き: "OpenSign[年][月]利用料として"（年月は設定により動的に変更）
 - 内訳
   - 基本利用料
   - 利用料（従量課金分）

@@ -74,7 +74,8 @@ func (h ReceiptHeader) Execute(report gr.GoReport) {
 
 	// Description
 	report.Font("NotoSansJP", FONT_SIZE_SMALL, "")
-	report.Cell(col0Left, 80, "但し、OpenSign利用料として")
+	description := "但し、OpenSign" + strconv.Itoa(h.data.ServiceYear) + "年" + strconv.Itoa(h.data.ServiceMonth) + "月利用料として"
+	report.Cell(col0Left, 80, description)
 }
 
 // ReceiptDetail shows the breakdown table
