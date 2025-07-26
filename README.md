@@ -8,11 +8,13 @@ OpenSignの利用料金請求書をPDF形式で生成するGoライブラリで�
 
 ## 特徴
 
-- 基本料金（月額2,000円、100件まで）
-- 従量課金（100件超過分は1件あたり100円）
+- 基本料金（月額2,000円、100件まで）※カスタマイズ可能
+- 従量課金（100件超過分は1件あたり100円）※カスタマイズ可能
 - 消費税（10%）自動計算
 - 日本語フォント（Noto Sans JP）対応
 - A4サイズPDF出力
+- テーブル形式の明細表示
+- io.ReaderベースのAPI（メモリ効率的）
 
 ## インストール
 
@@ -26,7 +28,9 @@ go get github.com/ryuyama/opensign-report-pdf
 package main
 
 import (
+    "io"
     "log"
+    "os"
     "time"
     
     opensignreport "github.com/ryuyama/opensign-report-pdf"
@@ -38,14 +42,30 @@ func main() {
         ReceiptNumber: "INV-2024-001",
         IssueDate:     time.Now(),
         MonthlyCount:  150,
+        // Optional: Customize fees (defaults: BasicFee=2000, FreeUsageCount=100, UsageFeeRate=100)
+        BasicFee:      2000,
+        FreeUsageCount: 100,
+        UsageFeeRate:  100,
     }
     
-    filename, err := opensignreport.GenerateInvoice(config)
+    reader, err := opensignreport.GenerateInvoice(config)
     if err != nil {
         log.Fatal(err)
     }
     
-    log.Printf("Invoice generated: %s", filename)
+    // Save to file
+    file, err := os.Create("invoice.pdf")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
+    
+    _, err = io.Copy(file, reader)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    log.Printf("Invoice generated: invoice.pdf")
 }
 ```
 
@@ -74,13 +94,25 @@ go build -o opensign-invoice ./cmd/opensign-invoice
 - `-receipt-no`: 請求書番号（必須）
 - `-date`: 発行日（YYYY-MM-DD形式、省略時は当日）
 
+## API設定
+
+### Config構造体
+
+- `CustomerName` (必須): 顧客名
+- `ReceiptNumber` (必須): 請求書番号
+- `IssueDate`: 発行日（省略時は当日）
+- `MonthlyCount` (必須): 月間利用件数
+- `BasicFee`: 基本料金（デフォルト: 2,000円）
+- `FreeUsageCount`: 無料利用件数（デフォルト: 100件）
+- `UsageFeeRate`: 従量課金単価（デフォルト: 100円/件）
+
 ## 料金計算
 
-- 基本料金: 2,000円（100件まで）
-- 従量課金: 100件を超えた分は1件あたり100円
+- 基本料金: 2,000円（100件まで）※カスタマイズ可能
+- 従量課金: 100件を超えた分は1件あたり100円 ※カスタマイズ可能
 - 消費税: 10%
 
-### 計算例
+### 計算例（デフォルト料金の場合）
 
 - 50件の場合: 2,000円 + 消費税200円 = 2,200円
 - 150件の場合: 2,000円 + 5,000円（50件×100円） + 消費税700円 = 7,700円
