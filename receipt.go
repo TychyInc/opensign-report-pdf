@@ -13,13 +13,27 @@ type ReceiptData struct {
 	UsageFee      int
 	Tax           int
 	TotalAmount   int
+	FreeUsageCount int
+	UsageFeeRate  int
 }
 
-func calculateFees(monthlyCount int) (basicFee, usageFee, tax, total int) {
-	basicFee = 2000
+func calculateFees(monthlyCount, basicFeeParam, freeUsageCount, usageFeeRate int) (basicFee, usageFee, tax, total int) {
+	if basicFeeParam == 0 {
+		basicFee = 2000
+	} else {
+		basicFee = basicFeeParam
+	}
 
-	if monthlyCount > 100 {
-		usageFee = (monthlyCount - 100) * 100
+	if freeUsageCount == 0 {
+		freeUsageCount = 100
+	}
+
+	if usageFeeRate == 0 {
+		usageFeeRate = 100
+	}
+
+	if monthlyCount > freeUsageCount {
+		usageFee = (monthlyCount - freeUsageCount) * usageFeeRate
 	}
 
 	subtotal := basicFee + usageFee

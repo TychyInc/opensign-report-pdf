@@ -1,7 +1,9 @@
 package opensignreport
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"strconv"
 	"time"
 
@@ -14,19 +16,32 @@ type Config struct {
 	ReceiptNumber string
 	IssueDate     time.Time
 	MonthlyCount  int
+	BasicFee      int
+	FreeUsageCount int
+	UsageFeeRate  int
 }
 
-// GenerateInvoice generates an invoice PDF with the given configuration
-func GenerateInvoice(config Config) (string, error) {
+// GenerateInvoice generates an invoice PDF with the given configuration and returns it as io.Reader
+func GenerateInvoice(config Config) (io.Reader, error) {
 	if config.CustomerName == "" || config.ReceiptNumber == "" || config.MonthlyCount == 0 {
-		return "", fmt.Errorf("customer name, receipt number, and monthly count are required")
+		return nil, fmt.Errorf("customer name, receipt number, and monthly count are required")
 	}
 
 	if config.IssueDate.IsZero() {
 		config.IssueDate = time.Now()
 	}
 
-	basicFee, usageFee, tax, total := calculateFees(config.MonthlyCount)
+	basicFee, usageFee, tax, total := calculateFees(config.MonthlyCount, config.BasicFee, config.FreeUsageCount, config.UsageFeeRate)
+
+	// Set default values if not provided
+	freeUsageCount := config.FreeUsageCount
+	if freeUsageCount == 0 {
+		freeUsageCount = 100
+	}
+	usageFeeRate := config.UsageFeeRate
+	if usageFeeRate == 0 {
+		usageFeeRate = 100
+	}
 
 	data := &ReceiptData{
 		CustomerName:  config.CustomerName,
@@ -37,18 +52,19 @@ func GenerateInvoice(config Config) (string, error) {
 		UsageFee:      usageFee,
 		Tax:           tax,
 		TotalAmount:   total,
+		FreeUsageCount: freeUsageCount,
+		UsageFeeRate:  usageFeeRate,
 	}
 
-	filename := fmt.Sprintf("%s.pdf", data.ReceiptNumber)
-	err := generatePDF(data, filename)
+	reader, err := generatePDF(data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return filename, nil
+	return reader, nil
 }
 
-func generatePDF(data *ReceiptData, filename string) error {
+func generatePDF(data *ReceiptData) (io.Reader, error) {
 	r := gr.CreateGoReport()
 	r.PageTotal = true
 	r.SumWork["mbreakdown"] = 0.0
@@ -56,7 +72,7 @@ func generatePDF(data *ReceiptData, filename string) error {
 	// Set up fonts
 	font1 := gr.FontMap{
 		FontName: "NotoSansJP",
-		FileName: "ttf//NotoSansJP-VariableFont_wght.ttf",
+		FileName: "../../ttf/NotoSansJP-VariableFont_wght.ttf",
 	}
 	fonts := []*gr.FontMap{&font1}
 	r.SetFonts(fonts)
@@ -68,16 +84,26 @@ func generatePDF(data *ReceiptData, filename string) error {
 	r.RegisterBand(gr.Band(ReceiptFooter{}), gr.PageFooter)
 
 	// Set up breakdown items as records
-	r.Records = []interface{}{
-		[]string{"基本利用料", strconv.Itoa(data.BasicFee)},
-		[]string{fmt.Sprintf("利用料 (%d件 × 100円)", data.MonthlyCount), strconv.Itoa(data.UsageFee)},
+	records := []interface{}{
+		[]string{fmt.Sprintf("基本利用料 (%d件まで無料)", data.FreeUsageCount), strconv.Itoa(data.BasicFee)},
 	}
+	
+	if data.UsageFee > 0 {
+		billableCount := data.MonthlyCount - data.FreeUsageCount
+		records = append(records, []string{
+			fmt.Sprintf("従量課金 (%d件 × %d円)", billableCount, data.UsageFeeRate),
+			strconv.Itoa(data.UsageFee),
+		})
+	}
+	
+	r.Records = records
 
 	// Configure page
 	r.SetPage("A4", "mm", "P")
 	r.SetFooterY(280)
 
 	// Generate PDF
-	r.Execute(filename)
-	return nil
+	r.Execute("")
+	pdfBytes := r.GetBytesPdf()
+	return bytes.NewReader(pdfBytes), nil
 }
