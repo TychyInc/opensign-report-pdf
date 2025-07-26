@@ -143,7 +143,6 @@ func (s ReceiptSummary) Execute(report gr.GoReport) {
 
 	// Total row with emphasis
 	y += 6
-	report.LineType("straight", 1.0)
 	report.GrayStroke(0.85)
 	report.LineH(x, y, x+tableWidth)
 	report.LineType("straight", 0.3)
@@ -153,13 +152,6 @@ func (s ReceiptSummary) Execute(report gr.GoReport) {
 	report.Font("NotoSansJP", FONT_SIZE_NORMAL, "")
 	report.Cell(x+2, y+1.5, "合計（税込）")
 	report.CellRight(x+tableWidth-2, y+1.5, 0, "￥"+gr.AddComma(strconv.Itoa(s.data.TotalAmount)))
-
-	// Stamp/seal area
-	y += 15
-
-	// Company seal
-	report.Font("NotoSansJP", FONT_SIZE_SMALL, "")
-	report.Cell(x+125, y, "【印】")
 }
 
 // ReceiptFooter for page numbers
