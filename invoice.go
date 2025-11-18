@@ -12,21 +12,21 @@ import (
 
 // Config holds the configuration for invoice generation
 type Config struct {
-	CustomerName  string
-	ReceiptNumber string
-	IssueDate     time.Time
-	MonthlyCount  int
-	BasicFee      int
+	CustomerName   string
+	ReceiptNumber  string
+	IssueDate      time.Time
+	MonthlyCount   int
+	BasicFee       int
 	FreeUsageCount int
-	UsageFeeRate  int
-	ServiceYear   int
-	ServiceMonth  int
+	UsageFeeRate   int
+	ServiceYear    int
+	ServiceMonth   int
 }
 
 // GenerateInvoice generates an invoice PDF with the given configuration and returns it as io.Reader
 func GenerateInvoice(config Config) (io.Reader, error) {
-	if config.CustomerName == "" || config.ReceiptNumber == "" || config.MonthlyCount == 0 {
-		return nil, fmt.Errorf("customer name, receipt number, and monthly count are required")
+	if config.CustomerName == "" || config.ReceiptNumber == "" {
+		return nil, fmt.Errorf("customer name and receipt number are required")
 	}
 
 	if config.IssueDate.IsZero() {
@@ -46,18 +46,18 @@ func GenerateInvoice(config Config) (io.Reader, error) {
 	}
 
 	data := &ReceiptData{
-		CustomerName:  config.CustomerName,
-		ReceiptNumber: config.ReceiptNumber,
-		IssueDate:     config.IssueDate,
-		MonthlyCount:  config.MonthlyCount,
-		BasicFee:      basicFee,
-		UsageFee:      usageFee,
-		Tax:           tax,
-		TotalAmount:   total,
+		CustomerName:   config.CustomerName,
+		ReceiptNumber:  config.ReceiptNumber,
+		IssueDate:      config.IssueDate,
+		MonthlyCount:   config.MonthlyCount,
+		BasicFee:       basicFee,
+		UsageFee:       usageFee,
+		Tax:            tax,
+		TotalAmount:    total,
 		FreeUsageCount: freeUsageCount,
-		UsageFeeRate:  usageFeeRate,
-		ServiceYear:   config.ServiceYear,
-		ServiceMonth:  config.ServiceMonth,
+		UsageFeeRate:   usageFeeRate,
+		ServiceYear:    config.ServiceYear,
+		ServiceMonth:   config.ServiceMonth,
 	}
 
 	reader, err := generatePDF(data)
@@ -91,7 +91,7 @@ func generatePDF(data *ReceiptData) (io.Reader, error) {
 	records := []interface{}{
 		[]string{fmt.Sprintf("基本利用料 (%d件まで無料)", data.FreeUsageCount), strconv.Itoa(data.BasicFee)},
 	}
-	
+
 	if data.UsageFee > 0 {
 		billableCount := data.MonthlyCount - data.FreeUsageCount
 		records = append(records, []string{
@@ -99,7 +99,7 @@ func generatePDF(data *ReceiptData) (io.Reader, error) {
 			strconv.Itoa(data.UsageFee),
 		})
 	}
-	
+
 	r.Records = records
 
 	// Configure page
