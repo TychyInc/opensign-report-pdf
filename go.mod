@@ -1,4 +1,4 @@
-module github.com/ryuyama/opensign-report-pdf
+module github.com/TychyInc/opensign-report-pdf
 
 go 1.23
 

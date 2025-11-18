@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	opensignreport "github.com/ryuyama/opensign-report-pdf"
+	opensignreport "github.com/TychyInc/opensign-report-pdf"
 )
 
 func main() {
@@ -70,15 +70,15 @@ func main() {
 
 	// Example with custom fee configuration
 	config3 := opensignreport.Config{
-		CustomerName:  "カスタム料金設定例",
-		ReceiptNumber: "INV-2024-003",
-		IssueDate:     time.Date(2024, 2, 1, 0, 0, 0, 0, time.Local),
-		MonthlyCount:  150,
-		BasicFee:      3000,      // 基本料金: 3000円
-		FreeUsageCount: 50,       // 無料利用枠: 50件
-		UsageFeeRate:  200,       // 従量課金単価: 200円/件
-		ServiceYear:   2024,
-		ServiceMonth:  1,
+		CustomerName:   "カスタム料金設定例",
+		ReceiptNumber:  "INV-2024-003",
+		IssueDate:      time.Date(2024, 2, 1, 0, 0, 0, 0, time.Local),
+		MonthlyCount:   150,
+		BasicFee:       3000, // 基本料金: 3000円
+		FreeUsageCount: 50,   // 無料利用枠: 50件
+		UsageFeeRate:   200,  // 従量課金単価: 200円/件
+		ServiceYear:    2024,
+		ServiceMonth:   1,
 	}
 
 	reader3, err := opensignreport.GenerateInvoice(config3)
