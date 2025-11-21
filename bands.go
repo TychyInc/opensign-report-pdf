@@ -110,13 +110,13 @@ func (d ReceiptDetail) Execute(report gr.GoReport) {
 	report.SumWork["mbreakdown"] += amount
 }
 
-// ReceiptSummary shows the summary with tax and total
+// ReceiptSummary shows the summary with total and tax rate
 type ReceiptSummary struct {
 	data *ReceiptData
 }
 
 func (s ReceiptSummary) GetHeight(report gr.GoReport) float64 {
-	return 35
+	return 18
 }
 
 func (s ReceiptSummary) Execute(report gr.GoReport) {
@@ -127,23 +127,7 @@ func (s ReceiptSummary) Execute(report gr.GoReport) {
 	report.LineType("straight", 0.3)
 	report.GrayStroke(0)
 
-	// Subtotal row
-	report.Rect(x, y, x+tableWidth, y+6)
-	report.LineV(x+80, y, y+6)
-	report.Font("NotoSansJP", FONT_SIZE_SMALL, "")
-	report.Cell(x+2, y+1.5, "小計")
-	subtotal := s.data.BasicFee + s.data.UsageFee
-	report.CellRight(x+tableWidth-2, y+1.5, 0, "￥"+gr.AddComma(strconv.Itoa(subtotal)))
-
-	// Tax row
-	y += 6
-	report.Rect(x, y, x+tableWidth, y+6)
-	report.LineV(x+80, y, y+6)
-	report.Cell(x+2, y+1.5, "消費税（10%）")
-	report.CellRight(x+tableWidth-2, y+1.5, 0, "￥"+gr.AddComma(strconv.Itoa(s.data.Tax)))
-
 	// Total row with emphasis
-	y += 6
 	report.GrayStroke(0.85)
 	report.LineH(x, y, x+tableWidth)
 	report.LineType("straight", 0.3)
@@ -151,8 +135,13 @@ func (s ReceiptSummary) Execute(report gr.GoReport) {
 	report.Rect(x, y, x+tableWidth, y+6)
 	report.LineV(x+80, y, y+6)
 	report.Font("NotoSansJP", FONT_SIZE_NORMAL, "")
-	report.Cell(x+2, y+1.5, "合計（税込）")
+	report.Cell(x+2, y+1.5, "合計")
 	report.CellRight(x+tableWidth-2, y+1.5, 0, "￥"+gr.AddComma(strconv.Itoa(s.data.TotalAmount)))
+
+	// Tax rate note (outside the box)
+	y += 8
+	report.Font("NotoSansJP", FONT_SIZE_SMALL, "")
+	report.Cell(x+2, y, "消費税率: "+strconv.Itoa(s.data.TaxRate)+"%")
 }
 
 // ReceiptFooter for page numbers

@@ -33,7 +33,7 @@ func GenerateInvoice(config Config) (io.Reader, error) {
 		config.IssueDate = time.Now()
 	}
 
-	basicFee, usageFee, tax, total := calculateFees(config.MonthlyCount, config.BasicFee, config.FreeUsageCount, config.UsageFeeRate)
+	basicFee, usageFee, total := calculateFees(config.MonthlyCount, config.BasicFee, config.FreeUsageCount, config.UsageFeeRate)
 
 	// Set default values if not provided
 	freeUsageCount := config.FreeUsageCount
@@ -42,7 +42,7 @@ func GenerateInvoice(config Config) (io.Reader, error) {
 	}
 	usageFeeRate := config.UsageFeeRate
 	if usageFeeRate == 0 {
-		usageFeeRate = 100
+		usageFeeRate = 110 // 税込み
 	}
 
 	data := &ReceiptData{
@@ -52,7 +52,7 @@ func GenerateInvoice(config Config) (io.Reader, error) {
 		MonthlyCount:   config.MonthlyCount,
 		BasicFee:       basicFee,
 		UsageFee:       usageFee,
-		Tax:            tax,
+		TaxRate:        10, // 10%固定
 		TotalAmount:    total,
 		FreeUsageCount: freeUsageCount,
 		UsageFeeRate:   usageFeeRate,
