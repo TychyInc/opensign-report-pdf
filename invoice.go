@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -68,15 +70,29 @@ func GenerateInvoice(config Config) (io.Reader, error) {
 	return reader, nil
 }
 
+// getFontPath returns the font file path based on OPENSIGN_TTF_DIR environment variable
+// If OPENSIGN_TTF_DIR is set, uses that directory. Otherwise, uses relative path.
+func getFontPath() string {
+	const fontFileName = "NotoSansJP-VariableFont_wght.ttf"
+
+	if ttfDir := os.Getenv("OPENSIGN_TTF_DIR"); ttfDir != "" {
+		return filepath.Join(ttfDir, fontFileName)
+	}
+
+	// Default: relative path for backward compatibility
+	return filepath.Join("../../ttf", fontFileName)
+}
+
 func generatePDF(data *ReceiptData) (io.Reader, error) {
 	r := gr.CreateGoReport()
 	r.PageTotal = true
 	r.SumWork["mbreakdown"] = 0.0
 
 	// Set up fonts
+	fontPath := getFontPath()
 	font1 := gr.FontMap{
 		FontName: "NotoSansJP",
-		FileName: "../../ttf/NotoSansJP-VariableFont_wght.ttf",
+		FileName: fontPath,
 	}
 	fonts := []*gr.FontMap{&font1}
 	r.SetFonts(fonts)
