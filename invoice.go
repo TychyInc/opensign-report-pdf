@@ -70,10 +70,14 @@ func GenerateInvoice(config Config) (io.Reader, error) {
 	return reader, nil
 }
 
-// getFontPath returns the font file path based on OPENSIGN_TTF_DIR environment variable
-// If OPENSIGN_TTF_DIR is set, uses that directory. Otherwise, uses relative path.
+// getFontPath returns the font file path based on environment variables.
+// OPENSIGN_TTF_DIR: directory containing font files (default: ../../ttf)
+// OPENSIGN_TTF_FILE: font file name (default: NotoSansJP-Regular.ttf)
 func getFontPath() string {
-	const fontFileName = "NotoSansJP-VariableFont_wght.ttf"
+	fontFileName := os.Getenv("OPENSIGN_TTF_FILE")
+	if fontFileName == "" {
+		fontFileName = "NotoSansJP-Regular.ttf"
+	}
 
 	if ttfDir := os.Getenv("OPENSIGN_TTF_DIR"); ttfDir != "" {
 		return filepath.Join(ttfDir, fontFileName)
